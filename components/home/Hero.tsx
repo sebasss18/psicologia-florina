@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   AnimatePresence,
   motion,
+  useInView,
   useMotionValue,
   useReducedMotion,
-  useScroll,
   useSpring,
   useTransform,
   type MotionValue,
@@ -90,12 +90,14 @@ function Blob({
   outer,
   inner,
   drift,
+  paused,
 }: {
   px: MotionValue<number>;
   py: MotionValue<number>;
   outer: string;
   inner: string;
   drift: Drift;
+  paused: boolean;
 }) {
   const reduce = useReducedMotion();
 
@@ -106,7 +108,7 @@ function Blob({
     >
       <motion.div
         className={`rounded-full will-change-transform ${inner}`}
-        animate={reduce ? undefined : { x: drift.x, y: drift.y }}
+        animate={reduce || paused ? undefined : { x: drift.x, y: drift.y }}
         transition={{
           duration: drift.duration,
           ease: "easeInOut",
@@ -120,6 +122,7 @@ function Blob({
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const inView = useInView(ref);
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -133,12 +136,42 @@ export default function Hero() {
   const cX = useTransform(sx, (v) => v * 100);
   const cY = useTransform(sy, (v) => v * -120);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 140]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  // Progreso de scroll propio: scrollY / alto del hero.
+  // Equivale a offset ["start start", "end start"] pero sin re-medir
+  // cuando la barra del navegador móvil se oculta/aparece.
+  const scrollProgress = useMotionValue(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let height = el.offsetHeight || 1;
+    let width = window.innerWidth;
+
+    const update = () => {
+      const p = window.scrollY / height;
+      scrollProgress.set(p < 0 ? 0 : p > 1 ? 1 : p);
+    };
+
+    const onResize = () => {
+      // Ignorar cambios solo de alto (barra del navegador en móvil)
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      height = el.offsetHeight || 1;
+      update();
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [scrollProgress]);
+
+  const contentY = useTransform(scrollProgress, [0, 1], [0, 140]);
+  const contentOpacity = useTransform(scrollProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
@@ -156,6 +189,7 @@ export default function Hero() {
       {/* Sin mask-image ni blur: gradientes radiales ya se ven difuminados */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Blob
+          paused={!inView}
           px={aX}
           py={aY}
           outer="-left-24 top-24"
@@ -167,6 +201,7 @@ export default function Hero() {
           }}
         />
         <Blob
+          paused={!inView}
           px={bX}
           py={bY}
           outer="-right-20 top-10"
@@ -179,6 +214,7 @@ export default function Hero() {
         />
         {/* Tercer blob solo en pantallas >= sm */}
         <Blob
+          paused={!inView}
           px={cX}
           py={cY}
           outer="bottom-10 left-1/3 hidden sm:block"
