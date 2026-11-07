@@ -4,12 +4,10 @@ import { useRef } from "react";
 import {
   motion,
   useScroll,
-  useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
 
-// Cuántas palabras se están aclarando al mismo tiempo (más = más suave)
 const WINDOW = 5;
 
 function Word({
@@ -24,9 +22,18 @@ function Word({
   const opacity = useTransform(progress, range, [0.15, 1]);
 
   return (
-    <>
-      <motion.span style={{ opacity }}>{children}</motion.span>{" "}
-    </>
+    <motion.span
+      style={{
+        opacity,
+        display: "inline-block",
+        willChange: "opacity",
+        transform: "translateZ(0)", // fuerza capa estable en iOS
+        backfaceVisibility: "hidden",
+        marginRight: "0.25em", // en lugar de {" "} fuera del span
+      }}
+    >
+      {children}
+    </motion.span>
   );
 }
 
@@ -38,15 +45,11 @@ export default function ScrollWords({
   className?: string;
 }) {
   const ref = useRef<HTMLParagraphElement>(null);
+
+  // Sin useSpring: el scroll táctil ya tiene su propia inercia
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 0.9", "end 0.4"],
-  });
-
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 30,
-    restDelta: 0.001,
   });
 
   const words = text.split(" ");
@@ -58,7 +61,7 @@ export default function ScrollWords({
         <Word
           key={i}
           range={[i / total, (i + WINDOW) / total]}
-          progress={progress}
+          progress={scrollYProgress}
         >
           {w}
         </Word>
