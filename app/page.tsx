@@ -1,10 +1,10 @@
-import Hero from "@/components/Hero";
-import Reveal from "@/components/Reveal";
-import Chips from "@/components/Chips";
-import FocusList from "@/components/FocusList";
-import FocusPanels from "@/components/FocusPanels";
-import Steps from "@/components/Steps";
-import ScrollWords from "@/components/ScrollWords";
+import Hero from "@/components/home/Hero";
+import Reveal from "@/components/shared/Reveal";
+import Chips from "@/components/home/Chips";
+import FocusList from "@/components/home/FocusList";
+import FocusPanels from "@/components/home/FocusPanels";
+import Steps from "@/components/home/Steps";
+import ScrollWords from "@/components/home/ScrollWords";
 
 const credenciales = [
   "Psicóloga clínica",
@@ -28,12 +28,29 @@ const problematicas = [
   "Patrones de comportamiento",
 ];
 
-const enfoque = ["Integral", "Individualizada", "Centrada en la persona"];
+const enfoque = [
+  {
+    title: "Integral",
+    description:
+      "Consideramos todas las dimensiones de tu vida: emocional, cognitiva, corporal y relacional. Integro distintas herramientas y modelos terapeuticos, como EMDR y conocimientos de neuropsicología, para comprender el trauma desde su origen y acompañar tu proceso de manera completa. ",
+  },
+  {
+    title: "Individualizada",
+    description:
+      "Cada historia es única, por eso no existen fórmulas generales. El tratamiento se adapta a tus necesidades, tu ritmo y tus objetivos, respetando siempre tu proceso personal y tus tiempos de recuperación.",
+  },
+  {
+    title: "Centrada en la persona",
+    description:
+      "Tú eres el centro de la terapia. Te ofrezco un espacio seguro, libre de juicios, donde puedas expresarte con confianza, sentirte escuchado(a) y ser protagonista de tu propio proceso de sanación.",
+  },
+];
 
 const objetivo = [
   "Comprender lo que estás viviendo",
   "Identificar las raíces de tu malestar",
   "Desarrollar herramientas que favorezcan tu bienestar emocional",
+  "Cambiar mecanismos y procesos cognitivos, que favorezcan tus conductas"
 ];
 
 const eyebrow = "font-serif text-lg italic tracking-wide text-accent";

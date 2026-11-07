@@ -9,7 +9,7 @@ import {
   useScroll,
 } from "framer-motion";
 import BrainLogo from "./BrainLogo";
-import NavLink from "./NavLinks";
+import NavLink from "../navigation/NavLinks";
 
 const links = [
   { href: "/acerca", label: "Acerca de mí" },

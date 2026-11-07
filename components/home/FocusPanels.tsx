@@ -5,7 +5,12 @@ import { motion, useReducedMotion } from "framer-motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export default function FocusPanels({ items }: { items: string[] }) {
+type Item = {
+  title: string;
+  description: string;
+};
+
+export default function FocusPanels({ items }: { items: Item[] }) {
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
   const dur = (s: number) => (reduce ? 0 : s);
@@ -16,7 +21,7 @@ export default function FocusPanels({ items }: { items: string[] }) {
         const on = active === i;
         return (
           <motion.button
-            key={item}
+            key={item.title}
             type="button"
             aria-pressed={on}
             onPointerEnter={(e) => {
@@ -65,13 +70,40 @@ export default function FocusPanels({ items }: { items: string[] }) {
               </motion.span>
             </span>
 
-            <motion.span
-              className="relative block font-serif text-3xl text-brown"
-              animate={{ x: on ? 8 : 0, opacity: on ? 1 : 0.55 }}
-              transition={{ duration: dur(0.6), ease }}
-            >
-              {item}
-            </motion.span>
+            <span className="relative block md:w-72 md:shrink-0">
+              <motion.span
+                className="block font-serif text-3xl text-brown"
+                animate={{ x: on ? 8 : 0, opacity: on ? 1 : 0.55 }}
+                transition={{ duration: dur(0.6), ease }}
+              >
+                {item.title}
+              </motion.span>
+
+              <motion.span
+                className="block overflow-hidden"
+                initial={false}
+                animate={{
+                  height: on ? "auto" : 0,
+                  opacity: on ? 1 : 0,
+                }}
+                transition={{
+                  height: { duration: dur(0.6), ease },
+                  opacity: {
+                    duration: dur(0.5),
+                    ease,
+                    delay: on ? dur(0.15) : 0,
+                  },
+                }}
+              >
+                <motion.span
+                  className="mt-3 block text-sm leading-relaxed text-brown/70"
+                  animate={{ y: on ? 0 : 12 }}
+                  transition={{ duration: dur(0.6), ease }}
+                >
+                  {item.description}
+                </motion.span>
+              </motion.span>
+            </span>
           </motion.button>
         );
       })}

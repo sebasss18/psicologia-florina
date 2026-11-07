@@ -1,5 +1,5 @@
 import Link from "next/link";
-import NavLink from "./NavLinks";
+import NavLink from "../navigation/NavLinks";
 import CurrentYear from "./CurrentYear";
 
 const links = [

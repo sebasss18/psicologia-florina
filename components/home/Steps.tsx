@@ -11,15 +11,20 @@ import {
 
 function Step({
   index,
+  total,
   text,
   progress,
 }: {
   index: number;
+  total: number;
   text: string;
   progress: MotionValue<number>;
 }) {
-  const start = index * 0.32;
-  const fill = useTransform(progress, [start, start + 0.14], [0, 1]);
+  const slot = 1 / total;
+  const start = index * slot * 0.9;
+  const end = start + slot * 0.45;
+
+  const fill = useTransform(progress, [start, end], [0, 1]);
   const textOpacity = useTransform(fill, [0, 1], [0.25, 1]);
 
   return (
@@ -64,7 +69,13 @@ export default function Steps({ items }: { items: string[] }) {
         style={{ scaleY: line }}
       />
       {items.map((text, i) => (
-        <Step key={text} index={i} text={text} progress={scrollYProgress} />
+        <Step
+          key={text}
+          index={i}
+          total={items.length}
+          text={text}
+          progress={scrollYProgress}
+        />
       ))}
     </ul>
   );
