@@ -21,6 +21,21 @@ const roles = [
   "Terapeuta EMDR",
 ];
 
+function useFinePointer() {
+  const [fine, setFine] = useState(false);
+
+  useEffect(() => {
+    const m = window.matchMedia("(hover: hover) and (pointer: fine)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFine(m.matches);
+    const onChange = () => setFine(m.matches);
+    m.addEventListener("change", onChange);
+    return () => m.removeEventListener("change", onChange);
+  }, []);
+
+  return fine;
+}
+
 function SplitLine({
   text,
   delay,
@@ -38,7 +53,7 @@ function SplitLine({
       {text.split("").map((c, i) => (
         <motion.span
           key={i}
-          className="inline-block will-change-transform"
+          className="inline-block"
           initial={{ y: "110%" }}
           animate={{ y: 0 }}
           transition={{ duration: 0.9, ease, delay: delay + i * 0.035 }}
@@ -90,25 +105,23 @@ function Blob({
   outer,
   inner,
   drift,
-  paused,
+  animated,
 }: {
   px: MotionValue<number>;
   py: MotionValue<number>;
   outer: string;
   inner: string;
   drift: Drift;
-  paused: boolean;
+  animated: boolean;
 }) {
-  const reduce = useReducedMotion();
-
   return (
     <motion.div
-      style={reduce ? undefined : { x: px, y: py }}
-      className={`absolute will-change-transform ${outer}`}
+      style={animated ? { x: px, y: py } : undefined}
+      className={`absolute ${outer}`}
     >
       <motion.div
-        className={`rounded-full will-change-transform ${inner}`}
-        animate={reduce || paused ? undefined : { x: drift.x, y: drift.y }}
+        className={`rounded-full ${inner}`}
+        animate={animated ? { x: drift.x, y: drift.y } : undefined}
         transition={{
           duration: drift.duration,
           ease: "easeInOut",
@@ -122,6 +135,8 @@ function Blob({
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const fine = useFinePointer();
+  const motionOn = fine && !reduce;
   const inView = useInView(ref);
 
   const mx = useMotionValue(0);
@@ -136,12 +151,10 @@ export default function Hero() {
   const cX = useTransform(sx, (v) => v * 100);
   const cY = useTransform(sy, (v) => v * -120);
 
-  // Progreso de scroll propio: scrollY / alto del hero.
-  // Equivale a offset ["start start", "end start"] pero sin re-medir
-  // cuando la barra del navegador móvil se oculta/aparece.
   const scrollProgress = useMotionValue(0);
 
   useEffect(() => {
+    if (!motionOn) return;
     const el = ref.current;
     if (!el) return;
 
@@ -154,7 +167,6 @@ export default function Hero() {
     };
 
     const onResize = () => {
-      // Ignorar cambios solo de alto (barra del navegador en móvil)
       if (window.innerWidth === width) return;
       width = window.innerWidth;
       height = el.offsetHeight || 1;
@@ -168,7 +180,7 @@ export default function Hero() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", onResize);
     };
-  }, [scrollProgress]);
+  }, [scrollProgress, motionOn]);
 
   const contentY = useTransform(scrollProgress, [0, 1], [0, 140]);
   const contentOpacity = useTransform(scrollProgress, [0, 0.7], [1, 0]);
@@ -178,7 +190,6 @@ export default function Hero() {
       id="inicio"
       ref={ref}
       onPointerMove={(e) => {
-        // Parallax solo con mouse; en touch no sirve y gasta CPU
         if (e.pointerType !== "mouse") return;
         const r = e.currentTarget.getBoundingClientRect();
         mx.set((e.clientX - r.left) / r.width - 0.5);
@@ -186,10 +197,9 @@ export default function Hero() {
       }}
       className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-gradient-to-b from-sand to-cream"
     >
-      {/* Sin mask-image ni blur: gradientes radiales ya se ven difuminados */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Blob
-          paused={!inView}
+          animated={motionOn && inView}
           px={aX}
           py={aY}
           outer="-left-24 top-24"
@@ -201,7 +211,7 @@ export default function Hero() {
           }}
         />
         <Blob
-          paused={!inView}
+          animated={motionOn && inView}
           px={bX}
           py={bY}
           outer="-right-20 top-10"
@@ -212,9 +222,8 @@ export default function Hero() {
             duration: 24,
           }}
         />
-        {/* Tercer blob solo en pantallas >= sm */}
         <Blob
-          paused={!inView}
+          animated={motionOn && inView}
           px={cX}
           py={cY}
           outer="bottom-10 left-1/3 hidden sm:block"
@@ -233,8 +242,8 @@ export default function Hero() {
       />
 
       <motion.div
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative px-6 pb-24 pt-24 text-center will-change-transform"
+        style={motionOn ? { y: contentY, opacity: contentOpacity } : undefined}
+        className="relative px-6 pb-24 pt-24 text-center"
       >
         <h1 aria-label="Psic. Florina Sotelo Mendoza">
           <motion.span
