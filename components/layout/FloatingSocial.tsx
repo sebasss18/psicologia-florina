@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-
-// NO OLVIDES LLENAR ESTOS LINKS
-const WHATSAPP_URL = "";
-const FACEBOOK_URL = "";
-const INSTAGRAM_URL = "";
-const TIKTOK_URL = "";
+const WHATSAPP_URL = "https://wa.me/message/MNYVZ4KAUAZ5A1";
+const INSTAGRAM_URL =
+  "https://www.instagram.com/psicologaflorinasotelo?mdxt=NzNjcDI2cjNvam83";
+const TIKTOK_URL =
+  "https://www.tiktok.com/@psicologaflorinasotelo?_r=1&_t=ZS-9BDabWplDWe";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -35,14 +34,6 @@ function WhatsAppIcon() {
   );
 }
 
-function FacebookIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M14 21v-8h3l.5-3.5H14V7.8c0-1 .4-1.6 1.7-1.6h1.8V3.2c-.4 0-1.4-.2-2.6-.2-2.6 0-4.1 1.5-4.1 4.2v2.3H8V13h2.8v8H14Z" />
-    </svg>
-  );
-}
-
 function InstagramIcon() {
   return (
     <svg {...iconProps}>
@@ -63,7 +54,6 @@ function TikTokIcon() {
 }
 
 const socials = [
-  { label: "Facebook", href: FACEBOOK_URL, Icon: FacebookIcon },
   { label: "Instagram", href: INSTAGRAM_URL, Icon: InstagramIcon },
   { label: "TikTok", href: TIKTOK_URL, Icon: TikTokIcon },
 ];
