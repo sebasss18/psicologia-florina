@@ -38,7 +38,7 @@ function SplitLine({
       {text.split("").map((c, i) => (
         <motion.span
           key={i}
-          className="inline-block"
+          className="inline-block will-change-transform"
           initial={{ y: "110%" }}
           animate={{ y: 0 }}
           transition={{ duration: 0.9, ease, delay: delay + i * 0.035 }}
@@ -65,9 +65,9 @@ function RoleCycler() {
       <AnimatePresence mode="wait">
         <motion.p
           key={roles[i]}
-          initial={{ y: 24, opacity: 0, filter: "blur(4px)" }}
-          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-          exit={{ y: -24, opacity: 0, filter: "blur(4px)" }}
+          initial={{ y: 24, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -24, opacity: 0 }}
           transition={{ duration: 0.6, ease }}
           className="text-lg tracking-wide text-muted"
         >
@@ -81,7 +81,6 @@ function RoleCycler() {
 type Drift = {
   x: number[];
   y: number[];
-  scale: number[];
   duration: number;
 };
 
@@ -103,13 +102,11 @@ function Blob({
   return (
     <motion.div
       style={reduce ? undefined : { x: px, y: py }}
-      className={`absolute ${outer}`}
+      className={`absolute will-change-transform ${outer}`}
     >
       <motion.div
-        className={`rounded-full blur-3xl ${inner}`}
-        animate={
-          reduce ? undefined : { x: drift.x, y: drift.y, scale: drift.scale }
-        }
+        className={`rounded-full will-change-transform ${inner}`}
+        animate={reduce ? undefined : { x: drift.x, y: drift.y }}
         transition={{
           duration: drift.duration,
           ease: "easeInOut",
@@ -148,25 +145,24 @@ export default function Hero() {
       id="inicio"
       ref={ref}
       onPointerMove={(e) => {
+        // Parallax solo con mouse; en touch no sirve y gasta CPU
+        if (e.pointerType !== "mouse") return;
         const r = e.currentTarget.getBoundingClientRect();
         mx.set((e.clientX - r.left) / r.width - 0.5);
         my.set((e.clientY - r.top) / r.height - 0.5);
       }}
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-sand to-cream"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-gradient-to-b from-sand to-cream"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]"
-      >
+      {/* Sin mask-image ni blur: gradientes radiales ya se ven difuminados */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Blob
           px={aX}
           py={aY}
           outer="-left-24 top-24"
-          inner="h-96 w-96 bg-accent-soft/60"
+          inner="h-72 w-72 bg-[radial-gradient(closest-side,theme(colors.accent-soft),transparent)] opacity-60 sm:h-96 sm:w-96"
           drift={{
             x: [0, 180, -120, 80, -180, 0],
             y: [0, -140, 120, 200, -80, 0],
-            scale: [1, 1.3, 0.8, 1.2, 0.9, 1],
             duration: 18,
           }}
         />
@@ -174,23 +170,22 @@ export default function Hero() {
           px={bX}
           py={bY}
           outer="-right-20 top-10"
-          inner="h-[30rem] w-[30rem] bg-sand-strong/90"
+          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.sand-strong),transparent)] opacity-90 sm:h-[30rem] sm:w-[30rem]"
           drift={{
             x: [0, -160, 100, -60, 140, 0],
             y: [0, 160, -100, -180, 80, 0],
-            scale: [1, 0.85, 1.25, 1, 1.15, 1],
             duration: 24,
           }}
         />
+        {/* Tercer blob solo en pantallas >= sm */}
         <Blob
           px={cX}
           py={cY}
-          outer="bottom-10 left-1/3"
-          inner="h-80 w-80 bg-accent-soft/40"
+          outer="bottom-10 left-1/3 hidden sm:block"
+          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.accent-soft),transparent)] opacity-40"
           drift={{
             x: [0, 120, -200, 60, -80, 0],
             y: [0, -120, -40, 100, -160, 0],
-            scale: [1, 1.2, 0.85, 1.3, 0.8, 1],
             duration: 30,
           }}
         />
@@ -203,7 +198,7 @@ export default function Hero() {
 
       <motion.div
         style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative px-6 pb-24 pt-24 text-center"
+        className="relative px-6 pb-24 pt-24 text-center will-change-transform"
       >
         <h1 aria-label="Psic. Florina Sotelo Mendoza">
           <motion.span
@@ -252,7 +247,7 @@ export default function Hero() {
         >
           <a
             href="/agendar"
-            className="flex items-center gap-3 border border-brown/20 bg-cream/70 px-8 py-3.5 text-xs uppercase tracking-[0.25em] text-brown backdrop-blur transition duration-500 active:scale-[0.98] active:border-accent/60 active:bg-white/60"
+            className="flex items-center gap-3 border border-brown/20 bg-cream/90 px-8 py-3.5 text-xs uppercase tracking-[0.25em] text-brown transition duration-500 active:scale-[0.98] active:border-accent/60 active:bg-white/60"
           >
             Agendar cita
             <span aria-hidden="true" className="text-accent">
