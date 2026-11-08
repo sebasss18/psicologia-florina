@@ -1,8 +1,8 @@
 export const contacto = [
   {
     label: "Teléfono",
-    value: "663561901",
-    href: "tel:+52663561901",
+    value: "6623561901",
+    href: "tel:+526623561901",
   },
   {
     label: "Correo",
