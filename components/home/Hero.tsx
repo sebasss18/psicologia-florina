@@ -94,7 +94,7 @@ function Blob({
   return (
     <motion.div style={{ x: px, y: py }} className={`absolute ${outer}`}>
       <div
-        className={`rounded-full will-change-transform ${variant} ${inner} ${
+        className={`will-change-transform ${variant} ${inner} ${
           paused ? "[animation-play-state:paused]" : ""
         }`}
       />
@@ -104,7 +104,6 @@ function Blob({
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
   const inView = useInView(ref);
 
   const mx = useMotionValue(0);
@@ -118,47 +117,6 @@ export default function Hero() {
   const bY = useTransform(sy, (v) => v * -220);
   const cX = useTransform(sx, (v) => v * 100);
   const cY = useTransform(sy, (v) => v * -120);
-
-  const scrollProgress = useMotionValue(0);
-
-  useEffect(() => {
-    if (reduce || !inView) return;
-    const el = ref.current;
-    if (!el) return;
-
-    let height = el.offsetHeight || 1;
-    let width = window.innerWidth;
-    let raf = 0;
-
-    const update = () => {
-      raf = 0;
-      const p = window.scrollY / height;
-      scrollProgress.set(p < 0 ? 0 : p > 1 ? 1 : p);
-    };
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-
-    const onResize = () => {
-      if (window.innerWidth === width) return;
-      width = window.innerWidth;
-      height = el.offsetHeight || 1;
-      onScroll();
-    };
-
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [scrollProgress, reduce, inView]);
-
-  const contentY = useTransform(scrollProgress, [0, 1], [0, 140]);
-  const contentOpacity = useTransform(scrollProgress, [0, 0.7], [1, 0]);
 
   return (
     <section
@@ -204,10 +162,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-cream via-cream/70 to-transparent"
       />
 
-      <motion.div
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-        className="relative px-6 pb-24 pt-24 text-center will-change-transform"
-      >
+      <div className="hero-content relative px-6 pb-24 pt-24 text-center">
         <h1 aria-label="Psic. Florina Sotelo Mendoza">
           <motion.span
             aria-hidden="true"
@@ -269,7 +224,7 @@ export default function Hero() {
             Acerca De Mi
           </a>
         </motion.div>
-      </motion.div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0 }}

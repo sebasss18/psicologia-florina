@@ -137,3 +137,32 @@ body {
     transform: none;
   }
 }
+
+@keyframes hero-out {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 140px, 0);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .hero-content {
+    will-change: transform, opacity;
+    animation: hero-out linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 100svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content {
+    animation: none;
+  }
+}
