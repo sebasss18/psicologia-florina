@@ -47,26 +47,13 @@ export default function FocusPanels({ items }: { items: Item[] }) {
               transition={{ duration: dur(0.8), ease }}
             />
 
-            <span className="relative flex items-start justify-between">
+            <span className="relative flex items-start">
               <motion.span
-                className="text-xs tracking-[0.2em] text-accent"
+                className="font-serif text-2xl italic text-accent"
                 animate={{ opacity: on ? 1 : 0.6 }}
                 transition={{ duration: dur(0.5) }}
               >
                 {String(i + 1).padStart(2, "0")}
-              </motion.span>
-
-              <motion.span
-                aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-accent/40 text-sm text-accent"
-                animate={{
-                  opacity: on ? 1 : 0,
-                  scale: on ? 1 : 0.6,
-                  rotate: on ? 0 : -45,
-                }}
-                transition={{ duration: dur(0.6), ease }}
-              >
-                →
               </motion.span>
             </span>
 
