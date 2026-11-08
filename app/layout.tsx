@@ -18,7 +18,19 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.tudominio.com";
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.NODE_ENV === "production"
+      ? undefined
+      : "http://localhost:3000");
+
+if (!SITE_URL) {
+  throw new Error(
+    "Set NEXT_PUBLIC_SITE_URL or deploy with VERCEL_PROJECT_PRODUCTION_URL.",
+  );
+}
+
 const SITE_NAME = "Psicóloga Florina";
 const DESCRIPTION =
   "Terapia psicológica en un espacio tranquilo y seguro. Te escucho y te acompaño en tu proceso: ansiedad, depresión, duelo, pareja y más.";
@@ -54,7 +66,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/opengraph-image.png",
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} - Un espacio tranquilo para escucharte`,
@@ -65,7 +77,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${SITE_NAME} | Terapia psicológica`,
     description: DESCRIPTION,
-    images: ["/og-image.jpg"],
+    images: ["/opengraph-image.png"],
   },
   robots: {
     index: true,
@@ -96,7 +108,7 @@ const jsonLd = {
   name: SITE_NAME,
   description: DESCRIPTION,
   url: SITE_URL,
-  image: `${SITE_URL}/og-image.jpg`,
+  image: `${SITE_URL}/opengraph-image.png`,
   telephone: "+52-000-000-0000",
   address: {
     "@type": "PostalAddress",
