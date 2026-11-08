@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Hero from "@/components/home/Hero";
 import Reveal from "@/components/shared/Reveal";
 import Chips from "@/components/home/Chips";
@@ -50,7 +51,7 @@ const objetivo = [
   "Comprender lo que estás viviendo",
   "Identificar las raíces de tu malestar",
   "Desarrollar herramientas que favorezcan tu bienestar emocional",
-  "Cambiar mecanismos y procesos cognitivos, que favorezcan tus conductas"
+  "Cambiar mecanismos y procesos cognitivos, que favorezcan tus conductas",
 ];
 
 const eyebrow = "font-serif text-lg italic tracking-wide text-accent";
@@ -64,16 +65,42 @@ export default function Home() {
         id="acerca"
         className="mx-auto max-w-6xl scroll-mt-20 px-6 py-32"
       >
-        <div className="grid gap-12 md:grid-cols-[1fr_2fr] md:gap-20">
-          <Reveal className="md:sticky md:top-32 md:self-start">
-            <p className={eyebrow}>Acerca de mí</p>
-            <h2 className="mt-4 font-serif text-4xl leading-tight text-brown sm:text-5xl">
-              Psic. Florina Sotelo Mendoza
-            </h2>
+        <div className="grid items-center gap-16 md:grid-cols-[auto_1fr] md:gap-24">
+          <Reveal className="mx-auto">
+            <div className="relative w-64 sm:w-72 md:w-80">
+              <div
+                aria-hidden="true"
+                className="absolute -inset-12 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-50"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 translate-x-4 translate-y-4 rounded-t-full bg-sand-strong"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 -translate-x-3 -translate-y-3 rounded-t-full border border-accent/40"
+              />
+              <div className="relative aspect-[3/4] overflow-hidden rounded-t-full">
+                <Image
+                  src="/foto-florina.jpeg"
+                  alt="Psic. Florina Sotelo Mendoza"
+                  fill
+                  sizes="(min-width: 768px) 320px, (min-width: 640px) 288px, 256px"
+                  className="object-cover object-top"
+                />
+              </div>
+            </div>
           </Reveal>
 
           <div>
-            <Reveal delay={0.1}>
+            <Reveal>
+              <p className={eyebrow}>Acerca de mí</p>
+              <h2 className="mt-4 font-serif text-4xl leading-tight text-brown sm:text-5xl">
+                Psic. Florina Sotelo Mendoza
+              </h2>
+            </Reveal>
+
+            <Reveal delay={0.1} className="mt-10">
               <p className="font-serif text-2xl leading-relaxed text-brown sm:text-3xl">
                 Soy psicóloga clínica con enfoque integrativo, especialista en
                 Psicotrauma, certificada en EMDR y con diplomado en

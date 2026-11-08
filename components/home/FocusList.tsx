@@ -11,7 +11,9 @@ export default function FocusList({ items }: { items: string[] }) {
   return (
     <ul
       className="grid border-b border-brown/10 md:grid-cols-2 md:gap-x-20"
-      onPointerLeave={() => setActive(null)}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") setActive(null);
+      }}
     >
       {items.map((item, i) => {
         const dim = active !== null && active !== i;
@@ -19,8 +21,12 @@ export default function FocusList({ items }: { items: string[] }) {
           <motion.li
             key={item}
             tabIndex={0}
-            onPointerEnter={() => setActive(i)}
-            onFocus={() => setActive(i)}
+            onPointerEnter={(e) => {
+              if (e.pointerType === "mouse") setActive(i);
+            }}
+            onFocus={(e) => {
+              if (e.currentTarget.matches(":focus-visible")) setActive(i);
+            }}
             onBlur={() => setActive(null)}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}

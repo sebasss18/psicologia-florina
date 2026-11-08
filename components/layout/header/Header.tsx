@@ -10,6 +10,7 @@ import {
 } from "framer-motion";
 import BrainLogo from "./BrainLogo";
 import NavLink from "../navigation/NavLinks";
+import { WHATSAPP_URL } from "@/lib/whatsapp";
 
 const links = [
   { href: "/acerca", label: "Acerca de mí" },
@@ -23,8 +24,10 @@ const ease = "ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 function CtaButton() {
   return (
-    <Link
-      href="/agendar"
+    <a
+      href={WHATSAPP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
       className="group relative inline-flex items-center overflow-hidden border border-brown/70 px-6 py-2.5 text-sm tracking-wide text-brown transition-colors duration-500 hover:text-cream"
     >
       <span
@@ -45,7 +48,7 @@ function CtaButton() {
           <path d="M3 8h10M9 4l4 4-4 4" />
         </svg>
       </span>
-    </Link>
+    </a>
   );
 }
 
@@ -132,8 +135,10 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href="/agendar"
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-between border-t border-brown/10 py-3 text-accent"
               >
@@ -148,7 +153,7 @@ export default function Header() {
                 >
                   <path d="M3 8h10M9 4l4 4-4 4" />
                 </svg>
-              </Link>
+              </a>
             </div>
           </motion.nav>
         )}
