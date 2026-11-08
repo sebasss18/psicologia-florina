@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useSpring,
   useTransform,
+  useScroll,
   type MotionValue,
 } from "framer-motion";
 import { WHATSAPP_URL } from "@/lib/whatsapp";
@@ -102,9 +103,93 @@ function Blob({
   );
 }
 
+function Leaf({ className, flip }: { className?: string; flip?: boolean }) {
+  return (
+    <motion.svg
+      viewBox="0 0 200 320"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      style={flip ? { transform: "scaleX(-1)" } : undefined}
+    >
+      <motion.path
+        d="M100 310 C100 220 100 140 100 20"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 2.2, ease, delay: 0.6 }}
+      />
+      {[
+        "M100 260 C60 250 40 220 38 190 C70 196 94 222 100 260Z",
+        "M100 220 C140 210 162 180 164 150 C130 156 106 182 100 220Z",
+        "M100 175 C62 165 44 138 42 110 C72 116 94 140 100 175Z",
+        "M100 135 C136 125 154 100 156 74 C128 80 106 102 100 135Z",
+        "M100 95 C70 86 56 66 54 46 C76 50 94 68 100 95Z",
+      ].map((d, i) => (
+        <motion.path
+          key={i}
+          d={d}
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0, fillOpacity: 0 }}
+          animate={{ pathLength: 1, fillOpacity: 0.12 }}
+          fill="currentColor"
+          transition={{ duration: 1.6, ease, delay: 1 + i * 0.25 }}
+        />
+      ))}
+    </motion.svg>
+  );
+}
+
+function Rings({ paused }: { paused: boolean }) {
+  const reduce = useReducedMotion();
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+    >
+      {[0, 1, 2].map((n) => (
+        <motion.div
+          key={n}
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.6, ease, delay: 0.3 + n * 0.2 }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        >
+          <div
+            className="rounded-full border border-accent/20"
+            style={{
+              width: `${22 + n * 12}rem`,
+              height: `${22 + n * 12}rem`,
+              animation:
+                reduce || paused
+                  ? undefined
+                  : `spin ${60 + n * 30}s linear infinite ${
+                      n % 2 ? "reverse" : ""
+                    }`,
+              borderStyle: n === 1 ? "dashed" : "solid",
+            }}
+          />
+        </motion.div>
+      ))}
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
+}
+
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref);
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"],
+  });
+  const hintOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+  const hintY = useTransform(scrollYProgress, [0, 0.12], [0, 48]);
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -137,7 +222,7 @@ export default function Hero() {
           px={aX}
           py={aY}
           outer="-left-24 top-24"
-          inner="h-72 w-72 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-60 sm:h-96 sm:w-96"
+          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-90 sm:h-[28rem] sm:w-[28rem]"
         />
         <Blob
           variant="blob-b"
@@ -145,17 +230,32 @@ export default function Hero() {
           px={bX}
           py={bY}
           outer="-right-20 top-10"
-          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.sand-strong),theme(colors.sand-strong/0))] opacity-90 sm:h-[30rem] sm:w-[30rem]"
+          inner="h-96 w-96 bg-[radial-gradient(closest-side,theme(colors.sand-strong),theme(colors.sand-strong/0))] sm:h-[34rem] sm:w-[34rem]"
         />
         <Blob
           variant="blob-c"
           paused={!inView}
           px={cX}
           py={cY}
-          outer="bottom-10 left-1/3 hidden sm:block"
-          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-40"
+          outer="bottom-10 left-1/3"
+          inner="h-72 w-72 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-60 sm:h-96 sm:w-96"
+        />
+        <div
+          className="absolute inset-0 opacity-[0.07] mix-blend-multiply"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          }}
         />
       </div>
+
+      <Rings paused={!inView} />
+
+      <Leaf className="pointer-events-none absolute -left-6 bottom-0 h-56 w-36 text-accent/50 sm:left-10 sm:h-96 sm:w-60" />
+      <Leaf
+        flip
+        className="pointer-events-none absolute -right-6 top-16 hidden h-72 w-44 text-accent/40 sm:block sm:right-10 sm:h-96 sm:w-60"
+      />
 
       <div
         aria-hidden="true"
@@ -229,15 +329,20 @@ export default function Hero() {
       </div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2 }}
-        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-brown/50"
+        style={{ opacity: hintOpacity, y: hintY }}
+        className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center"
       >
-        Desliza
-        <span className="relative block h-10 w-px bg-brown/15">
-          <span className="scroll-dot absolute left-1/2 top-0 h-1.5 w-1.5 rounded-full bg-accent" />
-        </span>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="flex flex-col items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-brown/50"
+        >
+          Desliza
+          <span className="relative block h-10 w-px bg-brown/15">
+            <span className="scroll-dot absolute left-1/2 top-0 h-1.5 w-1.5 rounded-full bg-accent" />
+          </span>
+        </motion.div>
       </motion.div>
     </section>
   );

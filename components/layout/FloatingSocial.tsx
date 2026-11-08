@@ -59,24 +59,34 @@ const socials = [
 ];
 
 export default function FloatingSocial() {
-  const [idle, setIdle] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [hover, setHover] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let burst = 0;
     let timer: ReturnType<typeof setTimeout>;
 
-    const schedule = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => setIdle(true), 1500);
-    };
-
     const onScroll = () => {
-      setIdle(false);
-      schedule();
+      const y = window.scrollY;
+      const t = performance.now();
+      const dy = Math.abs(y - lastY);
+      const dt = Math.max(t - lastT, 1);
+      lastY = y;
+      lastT = t;
+      burst += dy;
+
+      if (dy / dt > 1.2 || burst > 600) setHidden(true);
+
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        burst = 0;
+        setHidden(false);
+      }, 120);
     };
 
-    schedule();
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
@@ -94,7 +104,7 @@ export default function FloatingSocial() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const show = idle || hover || open;
+  const show = !hidden || hover || open;
 
   return (
     <motion.div
