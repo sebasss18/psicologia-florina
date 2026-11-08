@@ -198,7 +198,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-sand">
+      <section className="relative overflow-clip bg-sand">
         <Grain />
         <Wave className="bottom-10" />
         <Leaf className="-left-4 bottom-0 hidden h-72 w-44 text-accent/20 md:block" />
