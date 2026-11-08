@@ -21,21 +21,6 @@ const roles = [
   "Terapeuta EMDR",
 ];
 
-function useFinePointer() {
-  const [fine, setFine] = useState(false);
-
-  useEffect(() => {
-    const m = window.matchMedia("(hover: hover) and (pointer: fine)");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFine(m.matches);
-    const onChange = () => setFine(m.matches);
-    m.addEventListener("change", onChange);
-    return () => m.removeEventListener("change", onChange);
-  }, []);
-
-  return fine;
-}
-
 function SplitLine({
   text,
   delay,
@@ -51,15 +36,13 @@ function SplitLine({
       aria-hidden="true"
     >
       {text.split("").map((c, i) => (
-        <motion.span
+        <span
           key={i}
-          className="inline-block"
-          initial={{ y: "110%" }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.9, ease, delay: delay + i * 0.035 }}
+          className="split-char inline-block"
+          style={{ animationDelay: `${delay + i * 0.035}s` }}
         >
           {c === " " ? "\u00A0" : c}
-        </motion.span>
+        </span>
       ))}
     </span>
   );
@@ -93,40 +76,27 @@ function RoleCycler() {
   );
 }
 
-type Drift = {
-  x: number[];
-  y: number[];
-  duration: number;
-};
-
 function Blob({
   px,
   py,
   outer,
   inner,
-  drift,
-  animated,
+  variant,
+  paused,
 }: {
   px: MotionValue<number>;
   py: MotionValue<number>;
   outer: string;
   inner: string;
-  drift: Drift;
-  animated: boolean;
+  variant: "blob-a" | "blob-b" | "blob-c";
+  paused: boolean;
 }) {
   return (
-    <motion.div
-      style={animated ? { x: px, y: py } : undefined}
-      className={`absolute ${outer}`}
-    >
-      <motion.div
-        className={`rounded-full ${inner}`}
-        animate={animated ? { x: drift.x, y: drift.y } : undefined}
-        transition={{
-          duration: drift.duration,
-          ease: "easeInOut",
-          repeat: Infinity,
-        }}
+    <motion.div style={{ x: px, y: py }} className={`absolute ${outer}`}>
+      <div
+        className={`rounded-full will-change-transform ${variant} ${inner} ${
+          paused ? "[animation-play-state:paused]" : ""
+        }`}
       />
     </motion.div>
   );
@@ -135,8 +105,6 @@ function Blob({
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  const fine = useFinePointer();
-  const motionOn = fine && !reduce;
   const inView = useInView(ref);
 
   const mx = useMotionValue(0);
@@ -154,33 +122,40 @@ export default function Hero() {
   const scrollProgress = useMotionValue(0);
 
   useEffect(() => {
-    if (!motionOn) return;
+    if (reduce || !inView) return;
     const el = ref.current;
     if (!el) return;
 
     let height = el.offsetHeight || 1;
     let width = window.innerWidth;
+    let raf = 0;
 
     const update = () => {
+      raf = 0;
       const p = window.scrollY / height;
       scrollProgress.set(p < 0 ? 0 : p > 1 ? 1 : p);
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
     };
 
     const onResize = () => {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
       height = el.offsetHeight || 1;
-      update();
+      onScroll();
     };
 
     update();
-    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
-      window.removeEventListener("scroll", update);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
     };
-  }, [scrollProgress, motionOn]);
+  }, [scrollProgress, reduce, inView]);
 
   const contentY = useTransform(scrollProgress, [0, 1], [0, 140]);
   const contentOpacity = useTransform(scrollProgress, [0, 0.7], [1, 0]);
@@ -199,40 +174,28 @@ export default function Hero() {
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <Blob
-          animated={motionOn && inView}
+          variant="blob-a"
+          paused={!inView}
           px={aX}
           py={aY}
           outer="-left-24 top-24"
-          inner="h-72 w-72 bg-[radial-gradient(closest-side,theme(colors.accent-soft),transparent)] opacity-60 sm:h-96 sm:w-96"
-          drift={{
-            x: [0, 180, -120, 80, -180, 0],
-            y: [0, -140, 120, 200, -80, 0],
-            duration: 18,
-          }}
+          inner="h-72 w-72 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-60 sm:h-96 sm:w-96"
         />
         <Blob
-          animated={motionOn && inView}
+          variant="blob-b"
+          paused={!inView}
           px={bX}
           py={bY}
           outer="-right-20 top-10"
-          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.sand-strong),transparent)] opacity-90 sm:h-[30rem] sm:w-[30rem]"
-          drift={{
-            x: [0, -160, 100, -60, 140, 0],
-            y: [0, 160, -100, -180, 80, 0],
-            duration: 24,
-          }}
+          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.sand-strong),theme(colors.sand-strong/0))] opacity-90 sm:h-[30rem] sm:w-[30rem]"
         />
         <Blob
-          animated={motionOn && inView}
+          variant="blob-c"
+          paused={!inView}
           px={cX}
           py={cY}
           outer="bottom-10 left-1/3 hidden sm:block"
-          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.accent-soft),transparent)] opacity-40"
-          drift={{
-            x: [0, 120, -200, 60, -80, 0],
-            y: [0, -120, -40, 100, -160, 0],
-            duration: 30,
-          }}
+          inner="h-80 w-80 bg-[radial-gradient(closest-side,theme(colors.accent-soft),theme(colors.accent-soft/0))] opacity-40"
         />
       </div>
 
@@ -242,8 +205,8 @@ export default function Hero() {
       />
 
       <motion.div
-        style={motionOn ? { y: contentY, opacity: contentOpacity } : undefined}
-        className="relative px-6 pb-24 pt-24 text-center"
+        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
+        className="relative px-6 pb-24 pt-24 text-center will-change-transform"
       >
         <h1 aria-label="Psic. Florina Sotelo Mendoza">
           <motion.span
@@ -316,11 +279,7 @@ export default function Hero() {
       >
         Desliza
         <span className="relative block h-10 w-px bg-brown/15">
-          <motion.span
-            className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-accent"
-            animate={{ y: [0, 34, 0] }}
-            transition={{ duration: 2.4, ease: "easeInOut", repeat: Infinity }}
-          />
+          <span className="scroll-dot absolute left-1/2 top-0 h-1.5 w-1.5 rounded-full bg-accent" />
         </span>
       </motion.div>
     </section>
