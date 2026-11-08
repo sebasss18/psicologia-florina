@@ -11,7 +11,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-
+import { WHATSAPP_URL } from "@/lib/whatsapp";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const roles = [
@@ -209,7 +209,9 @@ export default function Hero() {
           className="mt-10 flex flex-col items-center gap-6 sm:hidden"
         >
           <a
-            href="/agendar"
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-3 border border-brown/20 bg-cream/90 px-8 py-3.5 text-xs uppercase tracking-[0.25em] text-brown transition duration-500 active:scale-[0.98] active:border-accent/60 active:bg-white/60"
           >
             Agendar cita
