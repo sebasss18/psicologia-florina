@@ -4,6 +4,7 @@ import Header from "@/components/layout/header/Header";
 import Footer from "@/components/layout/footer/Footer";
 import FloatingSocial from "@/components/layout/FloatingSocial";
 import "./globals.css";
+import CustomCursor from "@/components/layout/CustomCursor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -128,6 +129,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        <CustomCursor />
         <a
           href="#contenido"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-black"

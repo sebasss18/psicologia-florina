@@ -1,46 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-const drop: Variants = {
-  rest: {
-    opacity: 0,
-    x: 16,
-    scaleX: 0.6,
-    scaleY: 0.6,
-    transition: { duration: 0.2 },
-  },
-  hover: {
-    opacity: [0, 1, 1, 1, 1],
-    x: [16, 0, 0, 1, 0],
-    scaleX: [0.6, 1, 0.65, 1.15, 1],
-    scaleY: [0.6, 1, 1.4, 0.9, 1],
-    transition: {
-      duration: 0.9,
-      times: [0, 0.5, 0.62, 0.78, 1],
-      ease: "easeOut",
-    },
-  },
-};
-
-const ripple: Variants = {
-  rest: { opacity: 0, scale: 0.6, transition: { duration: 0.2 } },
-  hover: {
-    opacity: [0, 0.5, 0],
-    scale: [0.6, 0.6, 3.2],
-    transition: { duration: 0.9, times: [0, 0.55, 1], ease: "easeOut" },
-  },
+const stem: Variants = {
+  rest: { scaleY: 0, opacity: 0, transition: { duration: 0.45, ease } },
+  hover: { scaleY: 1, opacity: 0.8, transition: { duration: 0.9, ease } },
 };
 
 const label: Variants = {
-  rest: { x: 0, transition: { duration: 0.5, ease } },
-  hover: { x: 6, transition: { duration: 0.5, ease } },
+  rest: { x: 0, transition: { duration: 0.7, ease } },
+  hover: { x: 12, transition: { duration: 0.8, delay: 0.08, ease } },
 };
 
-export default function NavLink({
+const still: Variants = {
+  rest: { x: 0 },
+  hover: { x: 0 },
+};
+
+export default function NavLinkStem({
   href,
   label: text,
   onClick,
@@ -49,28 +29,28 @@ export default function NavLink({
   label: string;
   onClick?: () => void;
 }) {
+  const reduce = useReducedMotion();
+
   return (
     <motion.span
       className="relative inline-flex"
       initial="rest"
       animate="rest"
       whileHover="hover"
+      whileFocus="hover"
     >
       <Link
         href={href}
         onClick={onClick}
-        className="relative inline-flex items-center py-1 text-sm tracking-wide text-muted transition-colors duration-500 hover:text-brown"
+        className="relative inline-flex items-center py-1 text-sm tracking-wide text-muted transition-colors duration-700 hover:text-brown focus-visible:text-brown focus-visible:outline-none"
       >
         <motion.span
-          variants={drop}
-          style={{ transformOrigin: "0% 50%" }}
-          className="absolute -left-3 top-1/2 -mt-[3px] h-1.5 w-1.5 rounded-full bg-accent"
+          aria-hidden
+          variants={reduce ? undefined : stem}
+          style={{ transformOrigin: "50% 50%" }}
+          className="absolute -left-1 top-1/2 -mt-3 h-6 w-px bg-accent"
         />
-        <motion.span
-          variants={ripple}
-          className="absolute -left-3 top-1/2 -mt-[3px] h-1.5 w-1.5 rounded-full border border-accent"
-        />
-        <motion.span variants={label}>{text}</motion.span>
+        <motion.span variants={reduce ? still : label}>{text}</motion.span>
       </Link>
     </motion.span>
   );
