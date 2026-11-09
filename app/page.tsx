@@ -16,6 +16,7 @@ import FocusList from "@/components/home/FocusList";
 import FocusPanels from "@/components/home/FocusPanels";
 import Steps from "@/components/home/Steps";
 import ScrollWords from "@/components/home/ScrollWords";
+import SmoothScroll from "@/components/shared/SmoothScroll";
 
 const credenciales = [
   "Psicóloga clínica",
@@ -69,6 +70,7 @@ const eyebrow = "font-serif text-lg italic tracking-wide text-accent";
 export default function Home() {
   return (
     <>
+      <SmoothScroll ease={0.1} speed={1} />
       <Hero />
 
       <section id="acerca" className="relative scroll-mt-20 overflow-hidden">
