@@ -44,7 +44,7 @@ const enfoque = [
   {
     title: "Integral",
     description:
-      "Consideramos todas las dimensiones de tu vida: emocional, cognitiva, corporal y relacional. Integro distintas herramientas y modelos terapeuticos, como EMDR y conocimientos de neuropsicología, para comprender el trauma desde su origen y acompañar tu proceso de manera completa. ",
+      "Considero todas las dimensiones de tu vida: emocional, cognitiva, corporal y relacional. Integro distintas herramientas y modelos terapeuticos, como EMDR y conocimientos de neuropsicología, para comprender el trauma desde su origen y acompañar tu proceso de manera completa. ",
   },
   {
     title: "Individualizada",
